@@ -77,7 +77,7 @@ function main() {
         matrix = m4.scale(matrix,1,1,1.0);
         gl.uniformMatrix4fv(matrixUniformLocation, false, matrix);
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        setCircleVertices(gl, n, 0.05, 0.0, 0.0);
+        setCircleVertices(gl, n, 0.03, 0.0, 0.0);
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
         setCircleColor(gl, n, [0.2, 0, 0]);
         gl.drawArrays(gl.TRIANGLES, 0, 3 * n);
