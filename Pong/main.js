@@ -60,7 +60,7 @@ function main() {
 
     let n = 5000;
 
-    function drawSquare(){
+    function drawCircle(){
         gl.clear(gl.COLOR_BUFFER_BIT);
     
         theta += 2.0;
@@ -82,10 +82,10 @@ function main() {
         setCircleColor(gl, n, [0.2, 0, 0]);
         gl.drawArrays(gl.TRIANGLES, 0, 3 * n);
     
-        requestAnimationFrame(drawSquare);
+        requestAnimationFrame(drawCircle);
       }
     
-    drawSquare();
+    drawCircle();
 
 }
 
