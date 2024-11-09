@@ -1,4 +1,4 @@
-<!DOCTYPE <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -7,9 +7,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
     <script src="main.js" defer></script>
+    <style>
+        #scoreboard {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 10px;
+        }
+        .score {
+            margin: 0 20px;
+        }
+        .player {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <canvas id="c"></canvas>
+    <div id="scoreboard">
+        <span class="score player1">Jogador 1: 0</span>
+        <span class="score player2">Jogador 2: 0</span>
+    </div>
     <script id="vertex-shader-2d" type="notjs">
         attribute vec2 position;
         attribute vec3 color;
@@ -20,8 +37,8 @@
             gl_Position = matrix*vec4(position,0.0,1.0);
             vColor = color;
         }
-      </script>
-      <script id="fragment-shader-2d" type="notjs">
+    </script>
+    <script id="fragment-shader-2d" type="notjs">
         precision mediump float;
 
         varying vec3 vColor;        
@@ -29,6 +46,6 @@
         void main() {
             gl_FragColor = vec4(vColor,1.0);
         }
-      </script>
+    </script>
 </body>
 </html>
