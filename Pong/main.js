@@ -55,22 +55,96 @@ function main() {
     let theta = 0.0;
     let tx = 0.0;
     let ty = 0.0;
-    let tx_step = 0.01;
-    let ty_step = 0.02;
+    let tx_step = 0.02;
+    let ty_step = 0.01;
+    let raqEsq = 0.0;
+    let raqDir = 0.0;
+    let pontuacaoJogador1 = 0;
+    let pontuacaoJogador2 = 0;
+    let ganhador = 0;
 
     let n = 5000;
 
+    const bodyElement = document.querySelector("body");
+    bodyElement.addEventListener("keydown", keyDown, false);
+    document.addEventListener('keydown', keyDown);
+
+    function keyDown(event) {
+
+      if(event.key == 'ArrowUp') {
+        if (raqDir + 0.14 <= 1) {
+          raqDir = raqDir+0.05
+        }
+      }
+      if(event.key.toLowerCase() === 'w') {
+        if (raqEsq + 0.14 <= 1) {
+          raqEsq = raqEsq+0.05
+        }
+      }
+      if(event.key.toLowerCase() === 's') {
+        if (raqEsq - 0.14 >= -1) {
+          raqEsq = raqEsq-0.05
+        }
+      }
+      if(event.key == 'ArrowDown') {
+        if (raqDir - 0.14 >= -1) {
+          raqDir = raqDir-0.05
+        }
+      }
+  }
     function drawCircle(){
         gl.clear(gl.COLOR_BUFFER_BIT);
     
         theta += 2.0;
-        if(tx > 1.0 || tx < -1.0)
-          tx_step = -tx_step;
+        if(tx >= 1){  
+          if((ty <= raqDir+0.15 && ty >= raqDir-0.15)) {
+            tx_step = -tx_step;
+            tx_step -= 0.001;
+            ty_step -= 0.001;
+          } else {
+            pontuacaoJogador1 += 1;
+            updateScore();
+            tx = 0;
+            ty = 0;
+            tx_step = 0.02;
+            ty_step = 0.01;
+            raqEsq = 0;
+            raqDir = 0;
+          }
+        }
+        if(tx <= -1){  
+          if(ty <= raqEsq+0.15 && ty >= raqEsq-0.15) {
+            tx_step = -tx_step;
+            tx_step += 0.001;
+            ty_step += 0.001;
+          } else {
+            pontuacaoJogador2 += 1;
+            updateScore();
+            tx = 0;
+            ty = 0;
+            tx_step = 0.02;
+            ty_step = 0.01;
+            raqDir = 0;
+            raqEsq = 0;
+          }
+        }
         tx += tx_step;
-        if(ty > 1.0 || ty < -1.0)
+        if(ty > 1 || ty < -1)
           ty_step = -ty_step;
         ty += ty_step;
-    
+
+        if (pontuacaoJogador1 == 7) {
+          pontuacaoJogador1 = 0;
+          pontuacaoJogador2 = 0;
+          alert('Jogador 1 venceu!!');
+        }
+
+        if (pontuacaoJogador2 == 7) {
+          pontuacaoJogador1 = 0;
+          pontuacaoJogador2 = 0;
+          alert('Jogador 2 venceu!!');
+        }
+
         matrix = m4.identity();
         matrix = m4.translate(matrix,tx,ty,0.0);
         matrix = m4.zRotate(matrix, degToRad(theta));
@@ -81,12 +155,22 @@ function main() {
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
         setCircleColor(gl, n, [0.2, 0, 0]);
         gl.drawArrays(gl.TRIANGLES, 0, 3 * n);
+
+        drawRectangle(gl, positionBuffer, colorBuffer, matrixUniformLocation, -1, raqEsq, 0.05, 0.3, [0, 0, 1]);
+        drawRectangle(gl, positionBuffer, colorBuffer, matrixUniformLocation, 1, raqDir, 0.05, 0.3, [0, 0, 1]);
+
     
         requestAnimationFrame(drawCircle);
       }
     
     drawCircle();
 
+    function updateScore() {
+      const pontuacaoJogador1Element = document.querySelector('.player1');
+      const pontuacaoJogador2Element = document.querySelector('.player2');
+      pontuacaoJogador1Element.textContent = `Jogador 1: ${pontuacaoJogador1}`;
+      pontuacaoJogador2Element.textContent = `Jogador 2: ${pontuacaoJogador2}`;
+  }
 }
 
 function createShader(gl, type, source) {
@@ -278,7 +362,43 @@ var m4 = {
     },
 
 };
+
+function setRectangleVertices(gl, width, height) {
+  const x1 = -width / 2;
+  const x2 = width / 2;
+  const y1 = -height / 2;
+  const y2 = height / 2;
+  const vertices = [
+      x1, y1,
+      x2, y1,
+      x1, y2,
+      x1, y2,
+      x2, y1,
+      x2, y2,
+  ];
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+}
+
+function drawRectangle(gl, positionBuffer, colorBuffer, matrixUniformLocation, x, y, width, height, color) {
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  setRectangleVertices(gl, width, height);
   
+  let matrix = m4.identity();
+  matrix = m4.translate(matrix, x, y, 0.0);
+  gl.uniformMatrix4fv(matrixUniformLocation, false, matrix);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+  const colorData = [];
+  for (let i = 0; i < 6; i++) {
+      colorData.push(...color);
+  }
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorData), gl.STATIC_DRAW);
+
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+}
+
+
+
 function radToDeg(r) {
   return r * 180 / Math.PI;
 }
