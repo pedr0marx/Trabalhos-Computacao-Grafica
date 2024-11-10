@@ -1,3 +1,10 @@
+// Ana Beatriz Ribeiro Garcia, RA:168480 
+// Arthur Romano da Luz , RA: 168498 
+// Bruno de Abreu Correia, RA: 168522
+// Enrique Reis Susin, RA: 168640 
+// Leonardo Arazo de Oliveira, RA: 168873 
+// Pedro Marx Amaral Abreu, RA: 169236 
+
 function main() {
     const canvas = document.querySelector("#c");
     const gl = canvas.getContext('webgl');
@@ -28,10 +35,8 @@ function main() {
     gl.enableVertexAttribArray(colorLocation);
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
-
     
     const matrixUniformLocation = gl.getUniformLocation(program, `matrix`);
-    const colorUniformLocation = gl.getUniformLocation(program, `color`);
     
     let matrix = m4.identity();
     matrix = m4.scale(matrix,0.50,0.50,1.0);
@@ -55,8 +60,8 @@ function main() {
     let theta = 0.0;
     let tx = 0.0;
     let ty = 0.0;
-    let tx_step = 0.02;
-    let ty_step = 0.01;
+    let tx_step = 0.01;
+    let ty_step = 0.005;
     let raqEsq = 0.0;
     let raqDir = 0.0;
     let pontuacaoJogador1 = 0;
@@ -97,17 +102,17 @@ function main() {
     
         theta += 2.0;
         if(tx >= 1){  
-          if((ty <= raqDir+0.15 && ty >= raqDir-0.15)) {
-            tx_step = -tx_step;
-            tx_step -= 0.001;
+          if((ty <= raqDir+0.15 && ty >= raqDir-0.15)) { 
+            tx_step = -tx_step; 
+            tx_step -= 0.005; // toda vez que acertar a bolinha, a velocidade dela irá aumentar
             ty_step -= 0.001;
           } else {
             pontuacaoJogador1 += 1;
             updateScore();
-            tx = 0;
+            tx = 0; // reseta as coordenadas da bolinha para o centro denovo
             ty = 0;
-            tx_step = 0.02;
-            ty_step = 0.01;
+            tx_step = 0.01; // reseta a velocidade da bolinha
+            ty_step = 0.005;
             raqEsq = 0;
             raqDir = 0;
           }
@@ -115,15 +120,15 @@ function main() {
         if(tx <= -1){  
           if(ty <= raqEsq+0.15 && ty >= raqEsq-0.15) {
             tx_step = -tx_step;
-            tx_step += 0.001;
+            tx_step += 0.005;
             ty_step += 0.001;
           } else {
             pontuacaoJogador2 += 1;
             updateScore();
             tx = 0;
             ty = 0;
-            tx_step = 0.02;
-            ty_step = 0.01;
+            tx_step = 0.01;
+            ty_step = 0.005;
             raqDir = 0;
             raqEsq = 0;
           }
@@ -168,6 +173,7 @@ function main() {
     function updateScore() {
       const pontuacaoJogador1Element = document.querySelector('.player1');
       const pontuacaoJogador2Element = document.querySelector('.player2');
+
       pontuacaoJogador1Element.textContent = `Jogador 1: ${pontuacaoJogador1}`;
       pontuacaoJogador2Element.textContent = `Jogador 2: ${pontuacaoJogador2}`;
   }
@@ -396,8 +402,6 @@ function drawRectangle(gl, positionBuffer, colorBuffer, matrixUniformLocation, x
 
   gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
-
-
 
 function radToDeg(r) {
   return r * 180 / Math.PI;
